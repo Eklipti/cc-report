@@ -7,24 +7,30 @@ def generate_median_coffee_report(data: list[dict[str, str]]) -> tuple[list[str]
     """Рассчитывает медианные траты на кофе для каждого студента.
 
     Args:
-        data (list[dict[str, str]]): Данные, прочитанные из CSV.
+        data (list[dict[str, str]]): Сырые данные, прочитанные из CSV.
 
     Returns:
         tuple[list[str], list[list[str | float]]]: Заголовки таблицы и отсортированные данные отчета.
+
+    Raises:
+        KeyError: Если в переданных данных отсутствуют необходимые колонки.
     """
+    if not data:
+        return ["students", "median-coffee"], []
+
+    if "student" not in data[0] or "coffee_spent" not in data[0]:
+        raise KeyError("В данных отсутствуют обязательные колонки: 'student' или 'coffee_spent'")
+
     spending: defaultdict[str, list[float]] = defaultdict(list)
 
     for row in data:
-        student = row.get("student")
-        spent_str = row.get("coffee_spent")
+        student = row["student"]
+        spent_str = row["coffee_spent"]
 
         if not student or not spent_str:
             continue
 
-        try:
-            spent = float(spent_str)
-        except ValueError:
-            continue
+        spent = float(spent_str)
 
         spending[student].append(spent)
 
@@ -44,9 +50,8 @@ REPORTS_REGISTRY: dict[str, Callable[[list[dict[str, str]]], tuple[list[str], li
 }
 
 
-def get_report_function(
-    report_name: str,
-) -> Callable[[list[dict[str, str]]], tuple[list[str], list[list[str | float]]]] | None:
+def get_report_function(report_name: str) -> Callable[[list[dict[str, str]]], tuple[
+    list[str], list[list[str | float]]]] | None:
     """Возвращает функцию генерации отчета по его названию.
 
     Args:
