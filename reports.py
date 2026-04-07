@@ -50,8 +50,9 @@ REPORTS_REGISTRY: dict[str, Callable[[list[dict[str, str]]], tuple[list[str], li
 }
 
 
-def get_report_function(report_name: str) -> Callable[[list[dict[str, str]]], tuple[
-    list[str], list[list[str | float]]]] | None:
+def get_report_function(
+    report_name: str,
+) -> Callable[[list[dict[str, str]]], tuple[list[str], list[list[str | float]]]] | None:
     """Возвращает функцию генерации отчета по его названию.
 
     Args:
